@@ -1,3 +1,10 @@
+#message-list{
+  border-color: maroon;
+  border-style: solid;
+  border-width: 2px;
+  padding:4px;
+}
+
 div.message-container{
   width:100%;
   margin-bottom: 0.5em;
@@ -30,6 +37,9 @@ div.message-container.author-me div{
 
 div.message-container.author-me div.message{
   background-color: dodgerblue;
+}
+div.message-container.author-me.not-confirmed div.message{
+  background-color: darkorange;
 }
 
 div.message-container div.date{

@@ -1,6 +1,5 @@
 import React from 'react';
-import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
-import Input from 'react-bootstrap/lib/Input';
+import Constants from '../Constants';
 
 export default React.createClass({
   getDefaultProps() {
@@ -22,8 +21,15 @@ export default React.createClass({
 
   render() {
     var message = this.props.message;
+    var clazz = 'message-container';
+    if(message.author==='__ME__'){
+      clazz += ' author-me';
+    }
+    if(message.status === Constants.STATUS_MESSAGE_NOT_CONFIRMED){
+      clazz += ' not-confirmed';
+    }
     return (
-      <div className={'message-container'+((message.author==='__ME__')?' author-me':'')}>
+      <div className={clazz}>
         <div className="message">{message.text}</div>
         <div
           className="date">{message.date.getHours()}:{message.date.getMinutes()}:{message.date.getSeconds()}.{message.date.getMilliseconds()}</div>

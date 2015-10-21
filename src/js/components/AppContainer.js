@@ -1,7 +1,7 @@
 import React from 'react';
 import MessageStore from '../stores/MessageStore';
 import ActionCreator from '../actions/MessageActionCreators';
-import App from './App.jsx';
+import MessageList from './MessageList';
 
 export default React.createClass({
   _onChange() {
@@ -23,7 +23,7 @@ export default React.createClass({
   handleAddTask(e) {
     let title = prompt('Enter task title:');
     if (title) {
-      ActionCreator.addMessage(title);
+      ActionCreator.postMessage(title);
     }
   },
 
@@ -34,10 +34,7 @@ export default React.createClass({
   render() {
     let {tasks} = this.state;
     return (
-      <App
-        onAddTask={this.handleAddTask}
-        onClear={this.handleClear}
-        tasks={tasks} />
+      <MessageList />
     );
   }
 });

@@ -1,16 +1,10 @@
 import keyMirror from 'fbjs/lib/keyMirror';
 
-export default {
-  // event name triggered from store, listened to by views
-  CHANGE_EVENT: 'change',
+export default keyMirror({
+  MESSAGE_POSTED: null,
 
-  // Each time you add an action, add it here... They should be past-tense
-  ActionTypes: keyMirror({
-    MESSAGE_ADDED: null
-  }),
+  CHANGE_EVENT: null,
 
-  ActionSources: keyMirror({
-    SERVER_ACTION: null,
-    VIEW_ACTION: null
-  })
-};
+  STATUS_MESSAGE_NOT_CONFIRMED: null,
+  STATUS_MESSAGE_CONFIRMED: null
+});

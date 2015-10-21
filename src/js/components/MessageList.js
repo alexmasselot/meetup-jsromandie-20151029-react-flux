@@ -4,17 +4,13 @@ import Message from './Message';
 import MessageStore from '../stores/MessageStore';
 
 export default React.createClass({
-  getDefaultProps() {
+  getInitialState(){
     return {
       messages: []
     };
   },
   _onChange() {
-    this.setState(MessageStore.getAllMessages());
-  },
-
-  getInitialState() {
-    return MessageStore.getAllMessages();
+    this.setState({messages: MessageStore.getAllMessages()});
   },
 
   componentDidMount() {
@@ -28,13 +24,13 @@ export default React.createClass({
   /**
    * scroll to bottom
    */
-  componentDidUpdate() {
+    componentDidUpdate() {
     var node = ReactDOM.findDOMNode(this);
     node.scrollTop = node.scrollHeight;
   },
 
   render() {
-    var messages = this.props.messages;
+    var messages = this.state.messages;
     return (
       <div className="message-list">
         {messages.map(msg =>

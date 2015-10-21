@@ -1,42 +1,97 @@
 import Dispatcher from '../Dispatcher';
 import Constants from '../Constants';
-import BaseStore from './BaseStore';
+import {EventEmitter} from 'events';
+import MessageGenerator from '../services/MessageGenerator';
+
 import assign from 'object-assign';
+import _ from  'lodash';
 
 // data storage
 let _registeredMessages = [];
+let _clientMessages = [];
 
-// add private functions to modify data
-function addItem(title, completed=false) {
-  _registeredMessages.push({title, completed});
+let iClientId = 0;
+let iServerMessageId = 0;
+
+var messageGenerator = new MessageGenerator(['Paf']);
+
+// what would happen when a message is received from server (typically connected to a web socket
+function onMessageReceivedFromServer(message) {
+  var nMessage = _.extend({}, message, {id: 'srv_' + iServerMessageId, status: Constants.STATUS_MESSAGE_CONFIRMED});
+  iServerMessageId++;
+
+  //if the message has a clientId (so was issued by the client, it must be removed from the temporary stack)
+  //well, that method not reentrant, but the purpose here is to make a demo, nope?
+  if(message.clientId !== undefined) {
+    _clientMessages = _.filter(_clientMessages, function (msg) {
+      return msg.clientId !== message.clientId;
+    });
+  }
+  _registeredMessages.push(nMessage);
+
+  //let everyone who registered know that the store has change
+  MessageStore.emitChange();
+};
+
+//as we don't have any backnd server, we just simulate the behavior
+function fakeServerPostMessage(message) {
+  //in 0.5 second, the message will be received from server
+  setTimeout(function () {
+    onMessageReceivedFromServer(message);
+  }, 500);
+  // and concurrently create two random message from your friend, with random time between now and +1 second
+  messageGenerator.async(2,500, function(message){
+    onMessageReceivedFromServer(message);
+  });
+};
+
+// post a message, that, at this moment, only contain text and author
+function postMessage(content) {
+  var clientId = 'client_' + iClientId;
+  var message = _.extend({
+    clientId: clientId,
+    id: clientId,
+    date: new Date(),
+    status: Constants.STATUS_MESSAGE_NOT_CONFIRMED
+  }, content);
+  iClientId++;
+  _clientMessages.push(message);
+  fakeServerPostMessage(message);
+  MessageStore.emitChange();
 }
 
 // Facebook style store creation.
-const MessageStore = assign({}, BaseStore, {
-  // public methods used by Controller-View to operate on data
+const MessageStore = assign({}, EventEmitter.prototype, {
+  // Allow Controller-View to register itself with store
+  addChangeListener(callback) {
+    this.on(Constants.CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener(callback) {
+    this.removeListener(Constants.CHANGE_EVENT, callback);
+  },
+
+  // triggers change listener above, firing controller-view callback
+  emitChange() {
+    this.emit(Constants.CHANGE_EVENT);
+  },
+
   getAllMessages() {
-    return {
-      tasks: _registeredMessages
-    };
+    return _.flatten([_registeredMessages, _clientMessages]);
   },
 
   // register store with dispatcher, allowing actions to flow through
-  dispatcherIndex: Dispatcher.register(function(payload) {
-    let action = payload.action;
+  dispatcherIndex: Dispatcher.register(function (payload) {
+    let {type, args} = payload;
 
-    switch(action.type) {
-      case Constants.ActionTypes.MESSAGE_ADDED:
-        let text = action.text.trim();
-        // NOTE: if this action needs to wait on another store:
-        // Dispatcher.waitFor([OtherStore.dispatchToken]);
-        // For details, see: http://facebook.github.io/react/blog/2014/07/30/flux-actions-and-the-dispatcher.html#why-we-need-a-dispatcher
+    switch (type) {
+      case Constants.MESSAGE_POSTED:
+        let text = args.message.text.trim();
         if (text !== '') {
-          addItem(text);
-          MessageStore.emitChange();
+          postMessage({text: text, author: '__ME__'});
         }
         break;
 
-      // add more cases for other actionTypes...
     }
   })
 });
