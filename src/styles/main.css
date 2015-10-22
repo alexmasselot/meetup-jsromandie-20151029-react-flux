@@ -52,6 +52,25 @@ div.message-list{
   height:333px;
   overflow-y: auto;
 }
+
+div.message-counter span.label{
+  font-weight:bold;
+  width:10em;
+  float:left;
+  color:black;
+}
+div.message-counter span.badge{
+  color:black;
+}
+div.message-counter span.badge.received{
+  background-color:lightgray;
+}
+div.message-counter span.badge.confirmed{
+  background-color:dodgerblue;
+}
+div.message-counter span.badge.not-confirmed{
+  background-color:darkorange;
+}
 /*!
  * Bootstrap v3.3.2 (http://getbootstrap.com)
  * Copyright 2011-2015 Twitter, Inc.

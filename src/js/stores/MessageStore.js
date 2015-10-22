@@ -22,7 +22,7 @@ function onMessageReceivedFromServer(message) {
 
   //if the message has a clientId (so was issued by the client, it must be removed from the temporary stack)
   //well, that method not reentrant, but the purpose here is to make a demo, nope?
-  if(message.clientId !== undefined) {
+  if (message.clientId !== undefined) {
     _clientMessages = _.filter(_clientMessages, function (msg) {
       return msg.clientId !== message.clientId;
     });
@@ -40,7 +40,7 @@ function fakeServerPostMessage(message) {
     onMessageReceivedFromServer(message);
   }, 500);
   // and concurrently create two random message from your friend, with random time between now and +1 second
-  messageGenerator.async(2,500, function(message){
+  messageGenerator.async(2, 500, function (message) {
     onMessageReceivedFromServer(message);
   });
 };
@@ -76,10 +76,23 @@ const MessageStore = assign({}, EventEmitter.prototype, {
     this.emit(Constants.CHANGE_EVENT);
   },
 
+  // concatenates received and sent (unconfirmed) messages
   getAllMessages() {
     return _.flatten([_registeredMessages, _clientMessages]);
   },
 
+  //count the different type of message
+  counts() {
+    return {
+      received: _.filter(_registeredMessages, function (m) {
+        return m.author !== '__ME__';
+      }).length,
+      sentConfirmed: _.filter(_registeredMessages, function (m) {
+        return m.author === '__ME__';
+      }).length,
+      sentNotConfirmed: _clientMessages.length
+    }
+  },
   // register store with dispatcher, allowing actions to flow through
   dispatcherIndex: Dispatcher.register(function (payload) {
     let {type, args} = payload;
