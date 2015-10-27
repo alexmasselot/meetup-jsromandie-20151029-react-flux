@@ -17,6 +17,8 @@ To start the server, run:
 $ npm start
 ```
 
+Head to http://localhost:9002
+
 If you prefer to just build without the live reload and build-on-each-change watcher, run:
 
 ```bash
