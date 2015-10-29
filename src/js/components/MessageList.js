@@ -24,7 +24,7 @@ export default React.createClass({
   /**
    * scroll to bottom
    */
-    componentDidUpdate() {
+  componentDidUpdate() {
     var node = ReactDOM.findDOMNode(this);
     node.scrollTop = node.scrollHeight;
   },

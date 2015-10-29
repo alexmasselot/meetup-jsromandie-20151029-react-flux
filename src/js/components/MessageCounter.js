@@ -32,8 +32,8 @@ export default React.createClass({
         </div>
         <div>
           <span className="label">Sent</span>
-          <span className="badge not-confirmed">{counts.sentNotConfirmed}</span> / <span className="badge confirmed">{counts.sentConfirmed}</span>
-
+          <span className="badge not-confirmed">{counts.sentNotConfirmed}</span>
+           / <span className="badge confirmed">{counts.sentConfirmed}</span>
         </div>
       </div>
     );

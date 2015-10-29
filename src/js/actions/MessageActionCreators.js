@@ -8,5 +8,4 @@ export default {
       args: {message: message}
     })
   }
-
 };
